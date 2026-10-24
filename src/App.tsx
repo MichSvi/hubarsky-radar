@@ -9,6 +9,7 @@ import Alerts from './components/Alerts';
 import Method from './components/Method';
 
 type Tab = 'forecast' | 'atlas' | 'alerts' | 'method';
+const TAB_ICONS: Record<Tab, string> = { forecast: '🗺️', atlas: '🍄', alerts: '🔔', method: 'ℹ️' };
 
 export default function App() {
   const [lang, setLangState] = useState<Lang>(detectLang);
@@ -50,8 +51,16 @@ export default function App() {
       </header>
       <nav className="tabs" role="tablist">
         {(Object.keys(t.tabs) as Tab[]).map((k) => (
-          <button key={k} role="tab" aria-selected={tab === k} className={tab === k ? 'active' : ''} onClick={() => setTab(k)}>
-            {t.tabs[k]}
+          <button
+            key={k}
+            role="tab"
+            aria-selected={tab === k}
+            className={tab === k ? 'active' : ''}
+            onClick={() => { setTab(k); window.scrollTo({ top: 0 }); }}
+          >
+            <span className="tab-icon" aria-hidden>{TAB_ICONS[k]}</span>
+            <span className="tab-long">{t.tabs[k]}</span>
+            <span className="tab-short">{t.tabsShort[k]}</span>
           </button>
         ))}
       </nav>

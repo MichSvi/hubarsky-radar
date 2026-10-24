@@ -192,7 +192,7 @@ footer { margin-top: 20px; font-size: 0.85rem; }
 
 @media (max-width: 720px) {
   .modal-bg { padding: 0; place-items: end stretch; }
-  .modal { grid-template-columns: 1fr; border-radius: 18px 18px 0 0; max-height: 94vh; }
+  .modal { grid-template-columns: minmax(0, 1fr); border-radius: 18px 18px 0 0; max-height: 94vh; }
   .gallery > img, .noimg { aspect-ratio: 4 / 3; }
   .map { height: 280px; }
   .hide-sm { display: none; }
@@ -211,3 +211,98 @@ footer { margin-top: 20px; font-size: 0.85rem; }
 .tile-wrap { position: relative; }
 .tile-wrap .tile { width: 100%; height: 100%; }
 .tile-wrap .fav { position: absolute; top: 14px; right: 14px; background: var(--card); border-radius: 50%; width: 38px; height: 38px; box-shadow: var(--shadow); }
+
+/* ---------- Mobile / touch ---------- */
+.tab-icon, .tab-short { display: none; }
+/* 16px stops iOS Safari from zooming in when a field is focused. */
+input, select { font-size: 16px; }
+button, a, input, select { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+@media (hover: none) {
+  .species:hover, .results button:hover, .fav:hover { background: none; }
+  .fav:hover { color: var(--lv-none); }
+  .fav.on:hover { color: #e0a800; }
+}
+
+@media (max-width: 720px) {
+  #root { padding: 0 12px calc(84px + env(safe-area-inset-bottom)); }
+  .top { padding-top: calc(10px + env(safe-area-inset-top)); }
+  .brand img { width: 30px; height: 30px; }
+  .brand h1 { font-size: 1.15rem; }
+  .brand p { font-size: 0.78rem; }
+
+  /* Bottom tab bar like a native app */
+  .tabs {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 1500; margin: 0;
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 0;
+    background: var(--card); border-top: 1px solid var(--line); border-bottom: 0;
+    padding: 4px 4px calc(4px + env(safe-area-inset-bottom));
+    box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
+  }
+  .tabs button {
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    padding: 6px 2px; border: 0; border-radius: 10px; font-size: 0.72rem; min-height: 52px;
+  }
+  .tabs button.active { background: var(--chip); color: var(--brand); }
+  .tab-icon { display: block; font-size: 1.3rem; line-height: 1; }
+  .tab-long { display: none; }
+  .tab-short { display: block; }
+
+  .card { padding: 12px; margin-bottom: 10px; border-radius: 12px; }
+  h2 { font-size: 1.1rem; }
+  .btn { padding: 10px 12px; }
+  .chip { padding: 7px 12px; }
+  .map { height: 260px; }
+  .mapcard { padding: 8px; }
+  .results { max-height: 50vh; overflow-y: auto; }
+  .results button { padding: 12px 10px; }
+
+  .place-head h2 { font-size: 1.05rem; flex: 1 1 100%; }
+  .place-head .btn { flex: 1 1 auto; }
+  .conditions { grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 10px 0; }
+  .conditions div { padding: 6px 8px; }
+  .conditions dt { font-size: 0.68rem; line-height: 1.2; }
+  .conditions dd { font-size: 0.95rem; }
+  .forest > span:first-child { flex: 1 1 100%; font-weight: 600; }
+  .forest small { flex: 1 1 100%; }
+
+  /* Outlook: swipeable row of days */
+  .outlook { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 6px; margin: 0 -12px; padding: 0 12px 6px; scrollbar-width: none; }
+  .outlook::-webkit-scrollbar { display: none; }
+  .day { flex: 0 0 64px; scroll-snap-align: start; }
+
+  .list-head { gap: 4px 14px; }
+  .list-head h3 { flex: 1 1 100%; }
+  .check { min-height: 32px; }
+
+  /* Compact species rows: star sits above the percentage */
+  .species-list li { position: relative; }
+  .species { gap: 10px; padding: 8px 0; align-items: flex-start; }
+  .species .thumb { width: 54px !important; height: 54px !important; }
+  .species .info b { font-size: 0.95rem; line-height: 1.25; }
+  .species i { font-size: 0.78rem; }
+  .species .chance { align-self: flex-end; font-size: 1.2rem; min-width: 48px; }
+  .species-list .fav { position: absolute; top: 2px; right: 0; padding: 4px 6px; font-size: 1.35rem; }
+  .badge { font-size: 0.7rem; }
+  .tag { font-size: 0.72rem; }
+
+  /* Atlas: two columns */
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .tile { padding: 8px; font-size: 0.9rem; }
+  .tile b { line-height: 1.25; }
+  .tile-wrap .fav { top: 12px; right: 12px; width: 34px; height: 34px; font-size: 1.2rem; }
+
+  /* Detail as a bottom sheet with a close button that stays visible */
+  .modal .close { position: fixed; top: calc(6vh + 10px); right: 10px; z-index: 3; box-shadow: var(--shadow); }
+  .modal .body { padding: 14px 14px calc(16px + env(safe-area-inset-bottom)); }
+  .gallery { padding: 10px; }
+  .strip button { width: 48px; height: 48px; }
+  .lookalike { gap: 10px; padding: 8px; }
+  .lookalike .thumb { width: 64px !important; height: 64px !important; }
+
+  footer { font-size: 0.8rem; }
+}
+
+@media (max-width: 360px) {
+  .conditions { grid-template-columns: repeat(2, 1fr); }
+  .brand p { display: none; }
+}

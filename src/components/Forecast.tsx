@@ -143,7 +143,7 @@ export default function Forecast() {
             <i>{sp.latin}</i>
             <div className="row">
               <EdibilityBadge e={sp.edibility} />
-              {recent ? <span className="tag hot">● {t.recentNear}</span> : known ? <span className="tag">{t.knownNear}</span> : null}
+              {recent ? <span className="tag hot" title={t.recentNearLong}>● {t.recentNear}</span> : known ? <span className="tag" title={t.knownNearLong}>{t.knownNear}</span> : null}
             </div>
             {limiting[1] < 0.5 && <span className="small muted">↓ {t.factors[limiting[0]]}</span>}
           </div>
