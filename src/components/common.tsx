@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { Edibility, Species } from '../data/types';
 import { useT } from '../i18n';
+import { toggleFavorite, useFavorites } from '../lib/favorites';
 import { getTaxon, type TaxonInfo } from '../lib/inat';
 import { inMonths, level } from '../lib/score';
 
@@ -68,5 +69,22 @@ export function Bar({ value, label }: { value: number; label: string }) {
       <div className="track"><div className="fill" style={{ width: `${pct}%`, background: `var(--lv-${level(Math.min(1, value) * 0.8)})` }} /></div>
       <b>{pct}</b>
     </div>
+  );
+}
+
+export function FavStar({ id, big }: { id: string; big?: boolean }) {
+  const { t } = useT();
+  const on = useFavorites().includes(id);
+  return (
+    <button
+      type="button"
+      className={`fav ${on ? 'on' : ''} ${big ? 'big' : ''}`}
+      aria-pressed={on}
+      title={on ? t.removeFav : t.addFav}
+      aria-label={on ? t.removeFav : t.addFav}
+      onClick={(e) => { e.stopPropagation(); toggleFavorite(id); }}
+    >
+      {on ? '★' : '☆'}
+    </button>
   );
 }

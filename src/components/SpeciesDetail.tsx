@@ -3,7 +3,7 @@ import type { Lookalike, Species } from '../data/types';
 import { useT } from '../i18n';
 import { inatTaxonUrl } from '../lib/inat';
 import { level, type Score } from '../lib/score';
-import { Bar, Chance, EdibilityBadge, SeasonBar, Thumb, useTaxon } from './common';
+import { Bar, Chance, EdibilityBadge, FavStar, SeasonBar, Thumb, useTaxon } from './common';
 
 interface Props {
   sp: Species;
@@ -49,7 +49,7 @@ export default function SpeciesDetail({ sp, score, series, onClose }: Props) {
         </div>
         <div className="body">
           <header>
-            <h2>{name}</h2>
+            <h2>{name} <FavStar id={sp.id} big /></h2>
             <p className="latin">{sp.latin}{lang === 'sk' ? ` · ${sp.en}` : ` · ${sp.sk}`}</p>
             <div className="row">
               <EdibilityBadge e={sp.edibility} />

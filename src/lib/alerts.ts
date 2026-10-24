@@ -14,7 +14,7 @@ export interface WatchedPlace {
   forest: ForestType;
   shares?: { broadleaf: number; conifer: number; open: number };
   threshold: number; // 0–1
-  species: string[]; // empty = any edible species
+  species: string[]; // empty = favourites, or any edible species when there are none
   lastCheck?: string;
   lastNotified?: string;
   lastHits?: string[];
@@ -40,12 +40,15 @@ export async function checkAlerts(
   const lang = await getLang();
   const t = STRINGS[lang];
   const places = await getPlaces();
+  const favorites = (await store.get<string[]>('favorites')) ?? [];
   const hits: Hit[] = [];
   for (const place of places) {
     try {
       const weather = await fetchWeather(place.lat, place.lon);
       const ctx = { weather, forest: place.forest, shares: place.shares, evidence: {} };
-      const candidates = SPECIES.filter((s) => (place.species.length ? place.species.includes(s.id) : EDIBLE.has(s.edibility)));
+      // Per-place choice wins, then the user's favourites, then any edible species.
+      const wanted = place.species.length ? place.species : favorites;
+      const candidates = SPECIES.filter((s) => (wanted.length ? wanted.includes(s.id) : EDIBLE.has(s.edibility)));
       const found: Hit['species'] = [];
       for (const sp of candidates) {
         let best = { p: 0, date: '' };

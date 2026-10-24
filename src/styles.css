@@ -198,3 +198,16 @@ footer { margin-top: 20px; font-size: 0.85rem; }
   .hide-sm { display: none; }
   .fbar { grid-template-columns: 90px 1fr 30px; }
 }
+
+/* Favourites */
+.fav { flex: none; background: none; border: 0; font-size: 1.5rem; line-height: 1; padding: 6px; color: var(--lv-none); }
+.fav.on { color: #e0a800; }
+.fav.big { font-size: 1.6rem; vertical-align: middle; padding: 0 4px; }
+.fav:hover { color: #e0a800; }
+.species-list li { display: flex; align-items: center; }
+.species-list .species { flex: 1; min-width: 0; }
+.fav-list { background: color-mix(in srgb, #e0a800 7%, var(--card)); border-radius: 12px; padding: 0 6px; }
+.group { margin: 14px 0 4px; font-size: 0.95rem; }
+.tile-wrap { position: relative; }
+.tile-wrap .tile { width: 100%; height: 100%; }
+.tile-wrap .fav { position: absolute; top: 14px; right: 14px; background: var(--card); border-radius: 50%; width: 38px; height: 38px; box-shadow: var(--shadow); }

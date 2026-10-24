@@ -6,10 +6,11 @@ import { useT } from '../i18n';
 import { formatDate, getPlaces } from '../lib/alerts';
 import { fetchHabitat, type ForestType, type HabitatInfo } from '../lib/habitat';
 import { fungiTotal, inatId, recentSightings, speciesCounts, type Sighting } from '../lib/inat';
+import { useFavorites } from '../lib/favorites';
 import { watchPlace } from '../lib/notify';
 import { generalIndex, level, rainIndex, scoreSeries, scoreSpecies, type Context, type Evidence } from '../lib/score';
 import { fetchWeather, type Weather } from '../lib/weather';
-import { Chance, EdibilityBadge, Thumb } from './common';
+import { Chance, EdibilityBadge, FavStar, Thumb } from './common';
 import SpeciesDetail from './SpeciesDetail';
 
 interface Place { lat: number; lon: number; name: string }
@@ -37,6 +38,7 @@ async function reverseName(lat: number, lon: number, lang: string) {
 
 export default function Forecast() {
   const { t, lang } = useT();
+  const favorites = useFavorites();
   const [place, setPlace] = useState<Place | null>(initialPlace);
   const [weather, setWeather] = useState<Weather | null>(null);
   const [habitat, setHabitat] = useState<HabitatInfo | null | 'error'>(null);
@@ -120,6 +122,37 @@ export default function Forecast() {
     sightings.forEach((s) => m.set(s.taxonId, (m.get(s.taxonId) ?? 0) + 1));
     return m;
   }, [sightings]);
+
+  // Favourites are always listed (even with a low chance), the rest follow the filters.
+  const favRows = ranked.filter((r) => favorites.includes(r.sp.id));
+  const otherRows = visible.filter((r) => !favorites.includes(r.sp.id));
+
+  const renderRow = ({ sp, score }: (typeof ranked)[number]) => {
+    const id = inatId(sp.latin);
+    const recent = id && ((evidence.recent?.get(id) ?? 0) > 0 || (sightingCounts.get(id) ?? 0) > 0);
+    const known = id && (evidence.allTime?.get(id) ?? 0) > 0;
+    const limiting = (Object.entries(score.factors) as [keyof typeof score.factors, number][])
+      .filter(([k]) => k !== 'evidence')
+      .sort((a, b) => a[1] - b[1])[0];
+    return (
+      <li key={sp.id}>
+        <button className="species" onClick={() => setSelected(sp)}>
+          <Thumb latin={sp.latin} />
+          <div className="info">
+            <b>{lang === 'sk' ? sp.sk : sp.en}</b>
+            <i>{sp.latin}</i>
+            <div className="row">
+              <EdibilityBadge e={sp.edibility} />
+              {recent ? <span className="tag hot">● {t.recentNear}</span> : known ? <span className="tag">{t.knownNear}</span> : null}
+            </div>
+            {limiting[1] < 0.5 && <span className="small muted">↓ {t.factors[limiting[0]]}</span>}
+          </div>
+          <Chance p={score.p} />
+        </button>
+        <FavStar id={sp.id} />
+      </li>
+    );
+  };
 
   return (
     <div className="forecast">
@@ -213,33 +246,16 @@ export default function Forecast() {
             <label className="check"><input type="checkbox" checked={onlyEdible} onChange={(e) => setOnlyEdible(e.target.checked)} />{t.onlyEdible}</label>
             <label className="check"><input type="checkbox" checked={showAll} onChange={(e) => setShowAll(e.target.checked)} />{t.showAll}</label>
           </div>
-          <ul className="species-list">
-            {visible.map(({ sp, score }) => {
-              const id = inatId(sp.latin);
-              const recent = (id && ((evidence.recent?.get(id) ?? 0) > 0 || (sightingCounts.get(id) ?? 0) > 0));
-              const known = id && (evidence.allTime?.get(id) ?? 0) > 0;
-              const limiting = (Object.entries(score.factors) as [keyof typeof score.factors, number][])
-                .filter(([k]) => k !== 'evidence')
-                .sort((a, b) => a[1] - b[1])[0];
-              return (
-                <li key={sp.id}>
-                  <button className="species" onClick={() => setSelected(sp)}>
-                    <Thumb latin={sp.latin} />
-                    <div className="info">
-                      <b>{lang === 'sk' ? sp.sk : sp.en}</b>
-                      <i>{sp.latin}</i>
-                      <div className="row">
-                        <EdibilityBadge e={sp.edibility} />
-                        {recent ? <span className="tag hot">● {t.recentNear}</span> : known ? <span className="tag">{t.knownNear}</span> : null}
-                      </div>
-                      {limiting[1] < 0.5 && <span className="small muted">↓ {t.factors[limiting[0]]}</span>}
-                    </div>
-                    <Chance p={score.p} />
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
+          {favRows.length > 0 ? (
+            <>
+              <h4 className="group">★ {t.myMushrooms}</h4>
+              <ul className="species-list fav-list">{favRows.map(renderRow)}</ul>
+              <h4 className="group">{t.otherMushrooms}</h4>
+            </>
+          ) : (
+            <p className="muted small">{t.favHint}</p>
+          )}
+          <ul className="species-list">{otherRows.map(renderRow)}</ul>
         </section>
       )}
 
